@@ -52,7 +52,7 @@ Deep Translatorなどを使って英語文を日本語に翻訳し、対応す�
 ## 🧽 処理フロー図
 
 ```
-  input/input.ass
+input/input.ass
       ↓
 scripts/extract_ass_text.py
       ↓
