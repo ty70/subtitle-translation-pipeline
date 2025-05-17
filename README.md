@@ -38,10 +38,10 @@ python scripts/ass_replace_with_translation.py --input input/input.ass --json ou
 ### `extract_ass_text.py`（完成度：✅ OK）
 ASSファイルの [Events] セクションから15行直前以降の `Text` 部分を抽出し、プレーンな英語テキストとして出力します。
 
-### `merge_sentences.py`（完成度：⚠ ピリオドで整形されるが、翻訳時にやや不自然）
+### `merge_sentences.py`（完成度：⚠️ ピリオドで整形されるが、翻訳時にやや不自然）
 複数の字幕にまたがる文を一つにまとめ、句点（ピリオド）で整形することで、翻訳の質を高めます。
 
-### `translate_en_to_ja_json.py`（完成度：⚠ 英訳も微妙（これは文だけで翻訳しているので、ある程度仕方ない）しっかり行数に日本語を分けてくれない，改善する必要あり）
+### `translate_en_to_ja_json.py`（完成度：⚠️ 英訳も微妙（これは文だけで翻訳しているので、ある程度仕方ない）しっかり行数に日本語を分けてくれない，改善する必要あり）
 Deep Translatorなどを使って英語文を日本語に翻訳し、対応する行数に応じて自然に分割します。`output.json` 形式で保存します。
 
 ### `ass_replace_with_translation.py`（完成度：✅ OK）
