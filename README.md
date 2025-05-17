@@ -11,7 +11,7 @@ YouTubeなどの動画に付属する字幕ファイル（ASS形式）を対象�
 3. **日本語への翻訳と自然な文分割**（`scripts/translate_en_to_ja_json.py`）
 4. **ASSファイル内の字幕置換**（`scripts/ass_replace_with_translation.py`）
 
-また、本ツールは [YouTube Subtitle Pipeline](http://github.com/ty70/youtube-subtitle-pipeline.git) を使って英語の音声文字起こしから `.ass` 字幕ファイル（例：`modify.ass`）を作成した後の後処理ツール群としても活用できます。
+また、本ツールは [YouTube Subtitle Pipeline](http://github.com/ty70/youtube-subtitle-pipeline.git) を使って英語の音声文字起こしから `.ass` 字幕ファイル（例：`input/input.ass`）を作成した後の後処理ツール群としても活用できます。
 
 ---
 
