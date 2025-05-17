@@ -1,0 +1,24 @@
+# 仮想環境ディレクトリを無視（名前が venv の場合）
+venv/
+
+# tempは無視
+temp/
+
+# 例で途中で生成されるファイルは無視
+extracted_en.txt
+merged_en.json
+output.json
+modified_output.ass
+
+# 他の一般的な Python 開発用無視リスト（推奨）
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.sqlite3
+*.log
+*.db
+*.egg-info/
+.env
+.DS_Store
