@@ -1,75 +1,77 @@
-# -----------------------------------------------
+#!/usr/bin/env python3
+# ------------------------------------------
 # ass_replace_with_translation.py
 #
-# ASS形式の字幕ファイル（.ass）内の英語字幕を翻訳済みの日本語に置換するスクリプト。
+# 概要:
+#   ASS形式の字幕ファイルのセリフを、翻訳済みの日本語テキスト（JSON形式）で置換するスクリプト。
 #
 # 用途:
-#   JSONファイルで与えられた翻訳文（行番号と対応した日本語文）を用いて、
-#   ASSファイルの字幕テキストを置換、または日英両表示に編集する。
+#   英語のASS字幕を、日本語訳に差し替えて動画に焼き込む用途に使用。
 #
 # 入力:
-#   --input    : 入力用のASS字幕ファイル（例: modify.ass）
-#   --json     : 翻訳済みの字幕情報を含むJSONファイル（output.json）
-#   --mode     : 表示モード（'replace'=日本語のみ表示, 'dual'=日本語+英語両方表示）
+#   --input     : 置換対象のASS字幕ファイル（.ass）
+#   --json      : 日本語訳が格納されたJSONファイル（output.json形式）
+#   --output    : 出力先ASS字幕ファイルパス
 #
 # 出力:
-#   --output   : 日本語に置換されたASS字幕ファイル（例: modified_output.ass）
-#
-# 使用例:
-#   python ass_replace_with_translation.py --input modify.ass --json output.json --output modified_output.ass --mode dual
-# -----------------------------------------------
-import argparse
+#   指定されたパスに、日本語訳が反映されたASS字幕ファイルを保存。
+# ------------------------------------------
+
 import json
-import re
+import argparse
 
-def parse_args():
-    parser = argparse.ArgumentParser(description="Replace ASS subtitle text using a JSON translation mapping")
-    parser.add_argument('--input', required=True, help='Input ASS file path')
-    parser.add_argument('--json', required=True, help='JSON file with translated subtitles')
-    parser.add_argument('--output', required=True, help='Output ASS file path')
-    parser.add_argument('--mode', choices=['replace', 'dual'], default='replace', help='Display mode: replace or dual-language')
-    return parser.parse_args()
+def replace_ass_text(input_ass, output_json, output_ass):
+    # JSON読み込み
+    with open(output_json, "r", encoding="utf-8") as f:
+        translations = json.load(f)
 
-def load_translation(json_path):
-    with open(json_path, encoding='utf-8') as f:
-        return json.load(f)
+    # 行番号 → テキストのマップを作成
+    translation_map = {}
+    for entry in translations:
+        for i, ja_line in enumerate(entry["ja"]):
+            line_num = entry["start_line"] + i
+            translation_map[line_num] = ja_line
 
-def replace_subtitles(input_path, output_path, translation_data, mode='replace'):
-    with open(input_path, encoding='utf-8') as f:
-        lines = f.readlines()
+    # ASS変換処理
+    output_lines = []
+    line_counter = 0
+    in_events = False
 
-    dialogue_lines = []
-    current_line = 0
-    for i, line in enumerate(lines):
-        if line.startswith("Dialogue:"):
-            dialogue_lines.append((i, current_line))
-            current_line += 1
-
-    for entry in translation_data:
-        start, end, ja_lines = entry['start_line'], entry['end_line'], entry['ja']
-        for i in range(start - 1, end):
-            if i >= len(dialogue_lines):
+    with open(input_ass, "r", encoding="utf-8") as f:
+        for line in f:
+            if line.strip().startswith("[Events]"):
+                in_events = True
+                output_lines.append(line)
                 continue
-            idx, _ = dialogue_lines[i]
-            original_line = lines[idx]
-            match = re.match(r"(Dialogue: [^,]+,[^,]+,[^,]+,[^,]*,[^,]*,[^,]*,[^,]*,[^,]*,[^,]*,)(.*)", original_line)
-            if match:
-                prefix = match.group(1)
-                original_text = match.group(2).strip()
-                if mode == 'replace':
-                    new_text = '\\N'.join(ja_lines)
-                elif mode == 'dual':
-                    new_text = '\\N'.join(ja_lines + [original_text])  # 日本語上、英語下
-                lines[idx] = prefix + new_text + '\n'
 
-    with open(output_path, 'w', encoding='utf-8') as f:
-        f.writelines(lines)
+            if in_events and line.startswith("Dialogue:"):
+                line_counter += 1
+                if line_counter in translation_map:
+                    parts = line.strip().split(",", 9)
+                    if len(parts) == 10:
+                        parts[-1] = translation_map[line_counter]
+                        new_line = ",".join(parts) + "\n"
+                        output_lines.append(new_line)
+                    else:
+                        output_lines.append(line)
+                else:
+                    output_lines.append(line)
+            else:
+                output_lines.append(line)
 
-def main():
-    args = parse_args()
-    translations = load_translation(args.json)
-    replace_subtitles(args.input, args.output, translations, mode=args.mode)
-    print(f"✅ Output saved to {args.output}")
+    # 書き出し
+    with open(output_ass, "w", encoding="utf-8") as f:
+        f.writelines(output_lines)
 
-if __name__ == '__main__':
-    main()
+    print(f"✅ 字幕を日本語に置換しました: {output_ass}")
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="ASS字幕ファイルの英語テキストを翻訳済み日本語に置換")
+    parser.add_argument('--input', required=True, help='元のASS字幕ファイル（.ass）')
+    parser.add_argument('--json', required=True, help='翻訳結果のJSONファイル（output.json）')
+    parser.add_argument('--output', required=True, help='置換後に保存するASSファイルの出力パス')
+
+    args = parser.parse_args()
+
+    replace_ass_text(args.input, args.json, args.output)
