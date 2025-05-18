@@ -27,8 +27,8 @@ python scripts/merge_sentences.py --input extracted_en.txt --output merged_en.js
 # ステップ3: 翻訳と自然な日本語への分割結果をJSON形式で出力
 python scripts/translate_en_to_ja_json.py --input merged_en.json --output output.json
 
-# ステップ4: ASS字幕内の英語テキストを日本語字幕で置換
-python scripts/ass_replace_with_translation.py --input input/input.ass --json output.json --output modified_output.ass
+# ステップ4: ASS字幕内の英語テキストを日本語字幕で置換（モード指定可能）
+python scripts/ass_replace_with_translation.py --input input/input.ass --json output.json --output modified_output.ass --mode replace
 ```
 
 ---
@@ -45,8 +45,11 @@ ASSファイルの [Events] セクションから15行直前以降の `Text` 部
 Deep Translatorなどを使って英語文を日本語に翻訳し、対応する行数に応じて自然に分割します。`output.json` 形式で保存します。
 
 ### `ass_replace_with_translation.py`（完成度：✅ OK）
-元の `.ass` ファイルを読み取り、JSONファイルに基づいて英語のセリフを日本語に置換した字幕ファイルを生成します。
+元の `.ass` ファイルを読み取り、JSONファイルに基づいて英語のセリフを日本語に置換した字幕ファイルまたは日英両方の字幕を生成します。
 
+🆕 オプション機能：日英両字幕対応（日本語上、英語下）
+
+--mode オプションに dual を指定することで、英語字幕の下に翻訳された日本語字幕を追加できます。
 ---
 
 ## 🧽 処理フロー図
